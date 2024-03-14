@@ -16,6 +16,9 @@ class BaseModel(models.Model):
     is_published = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        abstract = True
+
 
 class Category(BaseModel):
     """
@@ -26,7 +29,7 @@ class Category(BaseModel):
     """
 
     title = models.CharField(max_length=256)
-    description = models.textField()
+    description = models.TextField()
     slug = models.SlugField(unique=True)
 
 
@@ -53,7 +56,7 @@ class Post(BaseModel):
     """
 
     title = models.CharField(max_length=256)
-    text = models.textField()
+    text = models.TextField()
     pub_date = models.DateTimeField()
     author = models.ForeignKey(
         User,
@@ -64,9 +67,11 @@ class Post(BaseModel):
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
+        related_name='posts_for_location',
     )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
         null=True,
+        related_name='posts_for_category',
     )
