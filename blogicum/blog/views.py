@@ -1,31 +1,52 @@
+from datetime import datetime as dt  # type: ignore[import-untyped]
+
+from django.shortcuts import get_object_or_404  # type: ignore[import-untyped]
 from django.shortcuts import render  # type: ignore[import-untyped]
 from django.http import HttpResponseNotFound  # type: ignore[import-untyped]
 from django.http import HttpResponse  # type: ignore[import-untyped]
+
+from .models import Category, Post
 
 
 def index(request) -> HttpResponse:
     """Главная страница."""
     template: str = 'blog/index.html'
-    context: dict = {'posts': posts[::-1]}
+    post_list = Post.objects.select_related('author', 'category').filter(
+        is_published=True,
+        category__is_published=True,
+        pub_date__lte=dt.now(),
+    )[:5]
+    context: dict = {'post_list': post_list}
     return render(request, template, context)
 
 
 def post_detail(request, id) -> HttpResponse:
     """Отдельный пост."""
     template: str = 'blog/detail.html'
-    context: dict = {}
-    for post in posts:
-        if post['id'] == id:
-            context = {'post': post}
-    if not context:
-        raise HttpResponseNotFound('Страница не найдена.')
+    post = get_object_or_404(Post.objects.select_related(
+        'author',
+        'category'
+    ).filter(
+        is_published=True,
+        category__is_published=True,
+        pub_date__lte=dt.now(),
+    ), pk=id)
+    context: dict = {'post': post}
     return render(request, template, context)
 
 
 def category_posts(request, category_slug) -> HttpResponse:
     """Категория постов."""
     template: str = 'blog/category.html'
+    category: Category = get_object_or_404(Category,
+                                           slug=category_slug)
+    post_list = Post.objects.select_related('author', 'category').filter(
+        is_published=True,
+        pub_date__lte=dt.now(),
+        category__contains=category,
+    )
     context: dict = {
-        'category': category_slug,
+        'category': category,
+        'post_list': post_list,
     }
     return render(request, template, context)
