@@ -109,7 +109,7 @@ class Post(BaseModel):
         related_name='posts_for_category',
         verbose_name='Категория',
     )
-    published_posts = CustomQuerySet.as_manager()
+    objects = CustomQuerySet.as_manager()
 
     class Meta:
         verbose_name = 'публикация'

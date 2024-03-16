@@ -12,7 +12,7 @@ NUM_ON_MAIN = 5  # Число новостей на главной страни�
 def index(request) -> HttpResponse:
     """Главная страница."""
     template: str = 'blog/index.html'
-    post_list: QuerySet = Post.published_posts.category_filter()[:NUM_ON_MAIN]
+    post_list: QuerySet = Post.objects.category_filter()[:NUM_ON_MAIN]
     context: dict = {'post_list': post_list}
     return render(request, template, context)
 
@@ -20,7 +20,7 @@ def index(request) -> HttpResponse:
 def post_detail(request, id) -> HttpResponse:
     """Отдельный пост."""
     template: str = 'blog/detail.html'
-    post: QuerySet = get_object_or_404(Post.published_posts.category_filter()
+    post: QuerySet = get_object_or_404(Post.objects.category_filter()
                                        .filter(pk=id))
     context: dict = {'post': post}
     return render(request, template, context)
@@ -31,7 +31,7 @@ def category_posts(request, category_slug) -> HttpResponse:
     category: Category = get_object_or_404(Category,
                                            is_published=True,
                                            slug=category_slug)
-    post_list: QuerySet = (Post.published_posts.publish_filter()
+    post_list: QuerySet = (Post.objects.publish_filter()
                            .filter(
                                category=category,
     ))
