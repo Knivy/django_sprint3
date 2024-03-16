@@ -1,6 +1,7 @@
 from django.db import models  # type: ignore[import-untyped]
 from django.contrib.auth import get_user_model  # type: ignore[import-untyped]
 
+from .querysets import CustomQuerySet
 
 User = get_user_model()
 
@@ -28,6 +29,7 @@ class BaseModel(models.Model):
 class Category(BaseModel):
     """
     Категория поста.
+
     title - название категории.
     description - описание категории.
     slug - слаг категории.
@@ -79,7 +81,7 @@ class Post(BaseModel):
     category - категория поста.
     """
 
-    title = models.CharField(max_length=256)
+    title = models.CharField(max_length=256, verbose_name='Заголовок')
     text = models.TextField(verbose_name='Текст')
     pub_date = models.DateTimeField(
         verbose_name='Дата и время публикации',
@@ -90,6 +92,7 @@ class Post(BaseModel):
         User,
         on_delete=models.CASCADE,
         verbose_name='Автор публикации',
+        related_name='posts_for_author',
     )
     location = models.ForeignKey(
         Location,
@@ -106,6 +109,7 @@ class Post(BaseModel):
         related_name='posts_for_category',
         verbose_name='Категория',
     )
+    published_posts = CustomQuerySet.as_manager()
 
     class Meta:
         verbose_name = 'публикация'

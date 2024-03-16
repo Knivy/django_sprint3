@@ -1,7 +1,7 @@
-from django.contrib import admin
+from django.contrib import admin  # type: ignore[import-untyped]
 from django.urls import include, path
 
-urlpatterns = [
+urlpatterns: list[path] = [
     path('admin/', admin.site.urls),
     path('', include('blog.urls')),
     path('posts/', include('blog.urls')),
