@@ -20,8 +20,8 @@ def index(request) -> HttpResponse:
 def post_detail(request, id) -> HttpResponse:
     """Отдельный пост."""
     template: str = 'blog/detail.html'
-    post: QuerySet = get_object_or_404(Post.objects.category_filter()
-                                       .filter(pk=id))
+    post: QuerySet = get_object_or_404(Post.objects.category_filter(),
+                                       pk=id)
     context: dict = {'post': post}
     return render(request, template, context)
 
@@ -31,10 +31,7 @@ def category_posts(request, category_slug) -> HttpResponse:
     category: Category = get_object_or_404(Category,
                                            is_published=True,
                                            slug=category_slug)
-    post_list: QuerySet = (Post.objects.publish_filter()
-                           .filter(
-                               category=category,
-    ))
+    post_list: QuerySet = category.posts_for_category.publish_filter()
     context: dict = {
         'category': category,
         'post_list': post_list,
